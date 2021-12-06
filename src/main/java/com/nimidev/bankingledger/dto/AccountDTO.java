@@ -1,6 +1,6 @@
 package com.nimidev.bankingledger.dto;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.*;
 import com.nimidev.bankingledger.domain.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,14 +13,16 @@ import java.util.List;
 
 @Getter
 @Setter
+@JsonIdentityInfo(
+        generator = ObjectIdGenerators.PropertyGenerator.class,
+        property = "accountId")
 public class AccountDTO extends Audit {
 
-    private Long id;
-
+    private Long accountId;
     private String accountNo;
     private double currentBalance;
     private CustomerDTO customer;
-    private BankDTO bank;
+    private BankBranchDTO bankBranch;
     private List<TransactionDTO> transactions;
     private CurrencyDTO currency;
 }

@@ -1,5 +1,5 @@
 package com.nimidev.bankingledger.enums;
 
-public enum TranactionMethod {
+public enum TransactionMethod {
     ONLINE,ATM,BANK_COUNTER
 }

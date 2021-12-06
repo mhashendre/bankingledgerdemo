@@ -1,12 +1,33 @@
+import javax.management.remote.JMXConnectorFactory
+import javax.management.remote.JMXServiceURL
+
 plugins {
 	id 'org.springframework.boot' version '2.6.1'
 	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
 	id 'java'
+	id 'org.sonarqube' version '3.1.1'
+	id 'jacoco'
+	id 'org.owasp.dependencycheck' version '6.1.2'
 }
 
 group = 'com.nimidev'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '11'
+
+sourceSets {
+	integrationTest {
+		java.srcDir 'src/test-integration/java'
+		resources.srcDir 'src/test-integration/resources'
+
+		compileClasspath += main.output + test.output
+		runtimeClasspath += main.output + test.output
+	}
+}
+
+jacoco {
+	toolVersion = "0.8.6"
+	reportsDirectory.dir("$buildDir/jacoco")
+}
 
 configurations {
 	compileOnly {
@@ -18,14 +39,53 @@ repositories {
 	mavenCentral()
 }
 
+jacoco {
+	toolVersion = "0.8.6"
+	reportsDirectory.dir("$buildDir/jacoco")
+}
+
 dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'mysql:mysql-connector-java'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	implementation group: 'org.modelmapper', name: 'modelmapper', version: '2.3.9'
+	implementation group: 'com.vaadin', name: 'vaadin-server', version: '8.14.3'
 }
 
-test {
-	useJUnitPlatform()
-}
+//task integrationTest(type: Test) {
+//	mustRunAfter test
+//	useJUnitPlatform()
+//	testClassesDirs = sourceSets.integrationTest.output.classesDirs
+//	classpath = sourceSets.integrationTest.runtimeClasspath
+//	outputs.upToDateWhen { false }
+//}
+
+//test {
+//	finalizedBy(integrationTest, jacocoTestReport)
+//	useJUnitPlatform()
+//	testClassesDirs = sourceSets.test.output.classesDirs
+//	classpath = sourceSets.test.runtimeClasspath
+//}
+
+//sonarqube {
+//	properties {
+//		property 'sonar.sourceEncoding', 'UTF-8'
+//		property 'sonar.coverage.jacoco.xmlReportPaths', "$buildDir/jacoco/xml/jacoco.xml"
+//		property 'sonar.tests', "src"
+//		property 'sonar.test.inclusions', '*Test.java'
+//	}
+//}
+
+//jacocoTestReport {
+//	dependsOn test
+//	dependsOn integrationTest
+//	reports {
+//		xml.enabled true
+//		xml.destination file("$buildDir/jacoco/xml/jacoco.xml")
+//		html.destination file("${buildDir}/reports/coverage/test")
+//	}
+//	executionData(test, integrationTest)
+//}

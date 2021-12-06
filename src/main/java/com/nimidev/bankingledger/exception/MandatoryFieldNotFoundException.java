@@ -1,6 +1,4 @@
-package com.zuhlke.salesorderprocessor.exceptions;
-
-import lombok.Getter;
+package com.nimidev.bankingledger.exception;
 
 public class MandatoryFieldNotFoundException extends Exception{
     public MandatoryFieldNotFoundException(String message){

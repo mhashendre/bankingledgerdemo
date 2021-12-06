@@ -1,6 +1,6 @@
 package com.nimidev.bankingledger.dto;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.*;
 import com.nimidev.bankingledger.domain.Account;
 import com.nimidev.bankingledger.domain.Audit;
 import com.nimidev.bankingledger.domain.Bank;
@@ -16,11 +16,17 @@ import java.util.List;
 
 @Getter
 @Setter
+@JsonIdentityInfo(
+        generator = ObjectIdGenerators.PropertyGenerator.class,
+        property = "bankBranchId")
 public class BankBranchDTO extends Audit {
 
-    private Long id;
+    private Long bankBranchId;
     private String branchCode;
     private String branchName;
     private String branchAddress;
+//    @JsonBackReference
     private BankDTO bank;
+//    @JsonManagedReference
+    private List<AccountDTO> accounts;
 }

@@ -1,4 +1,4 @@
-package com.zuhlke.salesorderprocessor.dto.response;
+package com.nimidev.bankingledger.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -1,4 +1,4 @@
-package com.zuhlke.salesorderprocessor.exceptions;
+package com.nimidev.bankingledger.exception;
 
 import lombok.Getter;
 

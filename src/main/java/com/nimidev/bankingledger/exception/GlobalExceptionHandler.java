@@ -1,7 +1,7 @@
-package com.zuhlke.salesorderprocessor.exceptions;
+package com.nimidev.bankingledger.exception;
 
-import com.zuhlke.salesorderprocessor.constants.HttpConstants;
-import com.zuhlke.salesorderprocessor.dto.response.ExceptionResponse;
+import com.nimidev.bankingledger.constants.HttpConstants;
+import com.nimidev.bankingledger.dto.response.ExceptionResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -10,12 +10,12 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 
-import java.io.FileNotFoundException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.Date;
 
-import static com.zuhlke.salesorderprocessor.constants.ErrorConstant.INTERNAL_SERVER_ERROR;
-import static com.zuhlke.salesorderprocessor.constants.ErrorConstant.ITEM_NOT_FOUND_ERROR;
+import static com.nimidev.bankingledger.constants.ErrorConstant.INTERNAL_SERVER_ERROR;
+import static com.nimidev.bankingledger.constants.ErrorConstant.ITEM_NOT_FOUND_ERROR;
+
 
 @Slf4j
 @ControllerAdvice
@@ -25,8 +25,8 @@ public class GlobalExceptionHandler {
   public ResponseEntity<ExceptionResponse> handleException(Exception ex, WebRequest webRequest) {
     if (ex instanceof ItemNotFoundException) {
       return handleItemNotFoundError(ex, webRequest);
-    } else if (ex instanceof FileNotFoundException) {
-      return handleFileNotFoundException(ex, webRequest);
+    } else if (ex instanceof BalanceNotSufficientException) {
+      return handleBalanceNotSufficientException(ex, webRequest);
     } else if (ex instanceof SQLIntegrityConstraintViolationException) {
       return handleSQLIntegrityException(ex, webRequest);
     } else {
@@ -53,6 +53,11 @@ public class GlobalExceptionHandler {
 
   private ResponseEntity<ExceptionResponse> handleSQLIntegrityException(
           Exception ex, WebRequest webRequest) {
+    return buildExceptionResponse(
+            HttpStatus.INTERNAL_SERVER_ERROR, INTERNAL_SERVER_ERROR, ex, webRequest);
+  }
+
+  private ResponseEntity<ExceptionResponse> handleBalanceNotSufficientException(Exception ex, WebRequest webRequest){
     return buildExceptionResponse(
             HttpStatus.INTERNAL_SERVER_ERROR, INTERNAL_SERVER_ERROR, ex, webRequest);
   }
