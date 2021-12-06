@@ -1,0 +1,26 @@
+spring:
+  data:
+    mongodb:
+      database: settings-test-db
+      host: localhost
+      port: 12345
+  config:
+    activate:
+      on-profile: TEST
+logging:
+  level:
+    org:
+      springframework:
+        data:
+          mongodb:
+            core:
+              MongoTemplate: DEBUG
+security:
+  auth:
+    pi:
+      token:
+        url: https://tst-piapi-internal.dev-openclass.com/tokens/
+        jwks:
+          proxy:
+            connecttimeoutmillis: 3000
+            readtimeoutmillis : 3000

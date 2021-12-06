@@ -1,0 +1,148 @@
+settings-provider:
+  request-url: https://toolsettingsprovider.qaprod.pearson.com/api/course/{0}
+  check: true
+
+http-client:
+  connection-timeout: 30000 # Determines the timeout in milliseconds until a connection is established.
+  request-timeout: 30000 # The timeout in milliseconds when requesting a connection from the connection manager.
+  socket-timeout: 60000 # The timeout in milliseconds for waiting for data.
+  close-idle-wait-timeout: 30000 #The idle time of connections to be closed in milliseconds.
+  keep-alive-time: 20000 #Default keep alive time in milliseconds.
+  max-total-connections: 50
+
+spring:
+  application:
+    name : Setting-Service
+  main:
+    banner-mode: off
+  data:
+    mongodb:
+      database: settings-test-db
+      host: localhost
+      port: 12345
+  flyway:
+    repeatable-sql-migration-prefix:
+security:
+  auth:
+    pi:
+      token:
+        url: https://tst-piapi-internal.dev-openclass.com/tokens/
+        jwks:
+          proxy:
+            connecttimeoutmillis: 3000
+            readtimeoutmillis : 3000
+management:
+  endpoints:
+    web:
+      exposure:
+        exclude: threaddump
+        include: health, loggers, info, metrics, prometheus, env, circuitbreakerevents, retryevents, circuitbreakers, retries
+  endpoint:
+    loggers:
+      enabled: true
+    prometheus:
+      enabled: true
+    health:
+      show-details: always
+      probes:
+        enabled: true
+    circuitbreakerevents:
+      enabled: true
+    retryevents:
+      enabled: true
+    circuitbreakers:
+      enabled: true
+    retries:
+      enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    tags:
+      application: ${appName}
+    distribution:
+      percentiles-histogram:
+        http:
+          server:
+            requests: true
+        resilience4j:
+          circuitbreaker:
+            calls: true
+  health:
+    mongo:
+      enabled: true
+    diskspace:
+      enabled: true
+    ping:
+      enabled: true
+    circuitbreakers:
+      enabled: true
+    ratelimiters:
+      enabled: true
+
+resilience4j.retry:
+  retryAspectOrder: 2
+  instances:
+    backendSPS:
+      maxRetryAttempts: 3
+      waitDuration: 100
+      retryExceptions:
+        - org.springframework.web.client.HttpServerErrorException
+        - java.util.concurrent.TimeoutException
+        - java.io.IOException
+        - org.apache.http.conn.HttpHostConnectException
+      ignoreExceptions:
+        - com.pearson.settings.resiliance.RecordFailurePredicate
+      recordFailurePredicate: com.pearson.settings.resiliance.RecordFailurePredicate
+    backendData:
+      maxRetryAttempts: 3
+      waitDuration: 30000
+      retryExceptions:
+        - com.mongodb.MongoSocketOpenException
+        - org.springframework.data.mongodb.UncategorizedMongoDbException
+        - org.springframework.dao.DataAccessResourceFailureException
+      ignoreExceptions:
+        - com.pearson.settings.resiliance.RecordFailurePredicate
+      recordFailurePredicate: com.pearson.settings.resiliance.RecordFailurePredicate
+
+resilience4j.circuitbreaker:
+  configs:
+    default:
+      registerHealthIndicator: true
+  circuitBreakerAspectOrder: 1
+  instances:
+    backendSPS:
+      baseConfig: default
+      registerHealthIndicator: true
+      slidingWindowSize: 10
+      minimumNumberOfCalls: 10
+      permittedNumberOfCallsInHalfOpenState: 5
+      automaticTransitionFromOpenToHalfOpenEnabled: true
+      waitDurationInOpenState: 5s
+      failureRateThreshold: 50
+      eventConsumerBufferSize: 10
+      recordExceptions:
+        - org.springframework.web.client.HttpServerErrorException
+        - java.util.concurrent.TimeoutException
+        - java.io.IOException
+        - org.apache.http.conn.HttpHostConnectException
+      ignoreExceptions:
+        - com.pearson.settings.resiliance.RecordFailurePredicate
+      recordFailurePredicate: com.pearson.settings.resiliance.RecordFailurePredicate
+    backendData:
+      baseConfig: default
+      registerHealthIndicator: true
+      slidingWindowSize: 10
+      minimumNumberOfCalls: 10
+      permittedNumberOfCallsInHalfOpenState: 5
+      automaticTransitionFromOpenToHalfOpenEnabled: true
+      waitDurationInOpenState: 5s
+      failureRateThreshold: 20
+      eventConsumerBufferSize: 10
+      recordExceptions:
+        - com.mongodb.MongoSocketOpenException
+        - org.springframework.data.mongodb.UncategorizedMongoDbException
+        - org.springframework.dao.DataAccessResourceFailureException
+      ignoreExceptions:
+        - com.pearson.settings.resiliance.RecordFailurePredicate
+      recordFailurePredicate: com.pearson.settings.resiliance.RecordFailurePredicate
